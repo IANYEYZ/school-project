@@ -3,6 +3,42 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { NextResponse } from "next/server";
 
+// PATCH handler for updating scores
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  
+  // Check session to ensure only logged-in users can update scores
+  const session = await getServerSession(authOptions);
+  
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (
+    (session.user as any)?.role !== "ADMIN" &&
+    (session.user as any)?.role !== "EDITOR"
+  ) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  try {
+    const { value, note } = await req.json();
+    
+    const updatedScore = await prisma.score.update({
+      where: { id },
+      data: {
+        ...(typeof value === "number" && { value }),
+        ...(note !== undefined && { note }),
+      },
+    });
+
+    return NextResponse.json(updatedScore);
+  } catch (error) {
+    console.error("Error updating score:", error);
+    return NextResponse.json({ error: "Error updating score" }, { status: 500 });
+  }
+}
+
 // DELETE handler
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
