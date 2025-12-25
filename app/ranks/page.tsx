@@ -90,7 +90,7 @@ export default async function RankPage() {
         {ranks.length === 0 ? (
           <p className="text-sm text-gray-500">暂无成绩数据。</p>
         ) : (
-          <div className="h-64">
+          <div className="h-80 sm:h-96">
             <RankBarChart labels={labels} data={data} />
           </div>
         )}

@@ -7,17 +7,14 @@ export type AuthUser = {
   role: "ADMIN" | "EDITOR";
 };
 
-// ⚠️ Generate hashes once (e.g. via bcrypt.hashSync) and paste here,
-//     or generate at build time. This example hashes at startup.
-
 const rawUsers = [
-  { username: "teacher1", password: "pass123", role: "ADMIN" },
-  { username: "teacher2", password: "pass456", role: "ADMIN" },
-  { username: "staff", password: "secret", role: "EDITOR" },
+  { username: "teacher1", password: "$2b$10$i4WpKvWcbuzREkmpsUmHW.ZAhYTsTQuIp4Ze2CTQDSHrD7JYBSz1q", role: "ADMIN" },
+  { username: "teacher2", password: "$2b$10$J.WgFN8IQEPtEhUVyvSWCO3AS926PztIpmqVaUWo/AxF1Of2KkqpW", role: "ADMIN" },
+  { username: "staff", password: "$2b$10$dgk/bE7vkp2Ch7KkEjZOBuNA7YBVbRJ2mUwr.6Qk4npw50GJu8Ize", role: "EDITOR" },
 ];
 
 export const users: AuthUser[] = rawUsers.map(u => ({
   username: u.username,
   role: u.role == "ADMIN" ? "ADMIN" : "EDITOR",
-  passwordHash: bcrypt.hashSync(u.password, 10),
+  passwordHash: u.password,
 }));

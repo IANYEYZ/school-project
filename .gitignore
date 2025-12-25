@@ -10,6 +10,8 @@
 !.yarn/releases
 !.yarn/versions
 
+/lib/test.mjs
+
 # testing
 /coverage
 

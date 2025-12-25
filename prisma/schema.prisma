@@ -22,6 +22,7 @@ model Score {
   date      DateTime  // Only date (YYYY-MM-DD)
   period    ScorePeriod
   value     Int
+  note      String?   // Optional note for this score
 
   createdAt DateTime  @default(now())
 

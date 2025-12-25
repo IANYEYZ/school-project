@@ -6,7 +6,7 @@ import { startOfToday } from "date-fns";
 
 export async function POST(req: Request) {
   try {
-    const { classId, noon, after } = await req.json();
+    const { classId, noon, noonNote, after, afterNote } = await req.json();
     const date = startOfToday();
 
     const ops: Promise<any>[] = [];
@@ -17,8 +17,8 @@ export async function POST(req: Request) {
           where: {
             classId_date_period: { classId, date, period: ScorePeriod.NOON },
           },
-          update: { value: noon },
-          create: { classId, date, period: ScorePeriod.NOON, value: noon },
+          update: { value: noon, note: noonNote || null },
+          create: { classId, date, period: ScorePeriod.NOON, value: noon, note: noonNote || null },
         })
       );
     }
@@ -28,8 +28,8 @@ export async function POST(req: Request) {
           where: {
             classId_date_period: { classId, date, period: ScorePeriod.AFTER_SCHOOL },
           },
-          update: { value: after },
-          create: { classId, date, period: ScorePeriod.AFTER_SCHOOL, value: after },
+          update: { value: after, note: afterNote || null },
+          create: { classId, date, period: ScorePeriod.AFTER_SCHOOL, value: after, note: afterNote || null },
         })
       );
     }

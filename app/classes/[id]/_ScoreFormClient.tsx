@@ -9,12 +9,22 @@ export default function ScoreFormClient({ classId }: { classId: string }) {
 
   const [noon, setNoon] = useState("");
   const [after, setAfter] = useState("");
+  const [noonNote, setNoonNote] = useState("");
+  const [afterNote, setAfterNote] = useState("");
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
 
   const canEdit =
     session?.user?.role === "ADMIN" ||
     session?.user?.role === "EDITOR";
+
+  const noonNum = noon ? parseInt(noon, 10) : null;
+  const afterNum = after ? parseInt(after, 10) : null;
+
+  const noonError = noonNum !== null && (noonNum < 0 || noonNum > 10);
+  const afterError = afterNum !== null && (afterNum < 0 || afterNum > 10);
+
+  const isValid = !noonError && !afterError && (noonNum !== null || afterNum !== null);
 
   // Optional: loading state
   if (status === "loading") {
@@ -41,7 +51,9 @@ export default function ScoreFormClient({ classId }: { classId: string }) {
 
     const body: any = { classId };
     if (noon) body.noon = parseInt(noon, 10);
+    if (noonNote) body.noonNote = noonNote;
     if (after) body.after = parseInt(after, 10);
+    if (afterNote) body.afterNote = afterNote;
 
     const res = await fetch("/api/scores", {
       method: "POST",
@@ -68,8 +80,24 @@ export default function ScoreFormClient({ classId }: { classId: string }) {
           type="number"
           value={noon}
           onChange={(e) => setNoon(e.target.value)}
-          className="mt-1 block w-full rounded border border-gray-300 px-2 py-1"
-          placeholder="例如 85"
+          min="0"
+          max="10"
+          className={`mt-1 block w-full rounded border px-2 py-1 ${
+            noonError
+              ? "border-red-500 bg-red-50"
+              : "border-gray-300"
+          }`}
+          placeholder="例如 8 (0-10)"
+        />
+        {noonError && (
+          <p className="text-xs text-red-600 mt-1">成绩必须在 0 到 10 之间</p>
+        )}
+        <textarea
+          value={noonNote}
+          onChange={(e) => setNoonNote(e.target.value)}
+          className="mt-2 block w-full rounded border border-gray-300 px-2 py-1 text-sm"
+          placeholder="中午备注 (可选)"
+          rows={2}
         />
       </div>
 
@@ -79,14 +107,30 @@ export default function ScoreFormClient({ classId }: { classId: string }) {
           type="number"
           value={after}
           onChange={(e) => setAfter(e.target.value)}
-          className="mt-1 block w-full rounded border border-gray-300 px-2 py-1"
-          placeholder="例如 90"
+          min="0"
+          max="10"
+          className={`mt-1 block w-full rounded border px-2 py-1 ${
+            afterError
+              ? "border-red-500 bg-red-50"
+              : "border-gray-300"
+          }`}
+          placeholder="例如 9 (0-10)"
+        />
+        {afterError && (
+          <p className="text-xs text-red-600 mt-1">成绩必须在 0 到 10 之间</p>
+        )}
+        <textarea
+          value={afterNote}
+          onChange={(e) => setAfterNote(e.target.value)}
+          className="mt-2 block w-full rounded border border-gray-300 px-2 py-1 text-sm"
+          placeholder="放学后备注 (可选)"
+          rows={2}
         />
       </div>
 
       <button
         type="submit"
-        disabled={busy}
+        disabled={busy || !isValid}
         className="rounded bg-blue-600 px-4 py-2 text-white disabled:opacity-50"
       >
         {busy ? "保存中…" : "保存今日成绩"}

@@ -2,6 +2,7 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import ScoreFormClient from "./_ScoreFormClient";
+import DeleteScoreButton from "./_DeleteScoreButton";
 import { ScorePeriod } from "@prisma/client";
 import { startOfToday, subDays } from "date-fns";
 import ScoreHistoryChart from "../ScoreHistoryChart";
@@ -73,17 +74,41 @@ export default async function ClassPage({ params }: { params: Promise<{ id: stri
                 <tr>
                   <th className="p-2 text-left text-sm font-medium text-gray-700">日期</th>
                   <th className="p-2 text-left text-sm font-medium text-gray-700">中午</th>
+                  <th className="p-2 text-left text-sm font-medium text-gray-700">中午备注</th>
                   <th className="p-2 text-left text-sm font-medium text-gray-700">放学后</th>
+                  <th className="p-2 text-left text-sm font-medium text-gray-700">放学后备注</th>
                 </tr>
               </thead>
               <tbody>
                 {dates.slice().reverse().map(d => {
                   const rec = map.get(d)!;
+                  const noonScore = scores.find(s => s.date.toISOString().split("T")[0] === d && s.period === ScorePeriod.NOON);
+                  const afterScore = scores.find(s => s.date.toISOString().split("T")[0] === d && s.period === ScorePeriod.AFTER_SCHOOL);
                   return (
                     <tr key={d} className="border-b hover:bg-gray-50">
                       <td className="p-2 text-sm text-gray-800">{d}</td>
-                      <td className="p-2 text-sm text-gray-800">{rec.noon ?? "-"}</td>
-                      <td className="p-2 text-sm text-gray-800">{rec.after ?? "-"}</td>
+                      <td className="p-2 text-sm text-gray-800">
+                        <span>{rec.noon ?? "-"}</span>
+                        {noonScore && <DeleteScoreButton scoreId={noonScore.id} />}
+                      </td>
+                      <td className="p-2 text-sm text-gray-700">
+                        {noonScore?.note ? (
+                          <span className="text-xs bg-blue-50 p-1 rounded block">{noonScore.note}</span>
+                        ) : (
+                          <span className="text-xs text-gray-400">—</span>
+                        )}
+                      </td>
+                      <td className="p-2 text-sm text-gray-800">
+                        <span>{rec.after ?? "-"}</span>
+                        {afterScore && <DeleteScoreButton scoreId={afterScore.id} />}
+                      </td>
+                      <td className="p-2 text-sm text-gray-700">
+                        {afterScore?.note ? (
+                          <span className="text-xs bg-blue-50 p-1 rounded block">{afterScore.note}</span>
+                        ) : (
+                          <span className="text-xs text-gray-400">—</span>
+                        )}
+                      </td>
                     </tr>
                   );
                 })}
@@ -97,7 +122,7 @@ export default async function ClassPage({ params }: { params: Promise<{ id: stri
       <Card>
         <h2 className="text-lg font-medium mb-4">成绩趋势 (图表)</h2>
         {dates.length > 0 ? (
-          <div className="h-64">
+          <div className="h-80 sm:h-96">
             <ScoreHistoryChart labels={dates} noonData={noonData} afterData={afterData} />
           </div>
         ) : (

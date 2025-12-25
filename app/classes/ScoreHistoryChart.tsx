@@ -62,7 +62,7 @@ export default function ScoreHistoryChart({
     scales: {
       y: {
         beginAtZero: true,
-        suggestedMax: 100,
+        suggestedMax: 10,
       },
     },
   } as const;

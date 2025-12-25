@@ -38,7 +38,7 @@ export default function RankBarChart({
       title: { display: false },
     },
     scales: {
-      y: { beginAtZero: true, suggestedMax: 100 },
+      y: { beginAtZero: true, suggestedMax: 10 },
     },
   };
 
